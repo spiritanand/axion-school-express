@@ -1,30 +1,45 @@
+const express = require("express");
 const config = require("./config/index.config.js");
-const Cortex = require("ion-cortex");
-const ManagersLoader = require("./loaders/ManagersLoader.js");
+const createRateLimiter = require("./mws/rate-limiter.mw");
 
-const mongoDB = config.dotEnv.MONGO_URI
-  ? require("./connect/mongo")({
-      uri: config.dotEnv.MONGO_URI,
-    })
-  : null;
+const app = express();
 
+// Basic middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Initialize cache
 const cache = require("./cache/cache.dbh")({
   prefix: config.dotEnv.CACHE_PREFIX,
   url: config.dotEnv.CACHE_REDIS,
 });
 
-const cortex = new Cortex({
-  prefix: config.dotEnv.CORTEX_PREFIX,
-  url: config.dotEnv.CORTEX_REDIS,
-  type: config.dotEnv.CORTEX_TYPE,
-  state: () => {
-    return {};
-  },
-  activeDelay: "50ms",
-  idlDelay: "200ms",
+// Rate limiter middleware
+const rateLimiter = createRateLimiter({
+  cache,
+  windowMs: parseInt(config.dotEnv.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
+  max: parseInt(config.dotEnv.RATE_LIMIT_MAX_REQUESTS) || 100, // limit each IP to 100 requests per windowMs
 });
 
-const managersLoader = new ManagersLoader({ config, cache, cortex });
-const managers = managersLoader.load();
+// Apply rate limiter to all routes
+app.use(rateLimiter);
 
-managers.userServer.run();
+// Add rate limit headers to all responses
+app.use((req, res, next) => {
+  res.setHeader("X-RateLimit-Limit", config.dotEnv.RATE_LIMIT_MAX_REQUESTS);
+  next();
+});
+
+// Load routes
+app.use("/api", require("./routes"));
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: "Internal Server Error",
+    details: process.env.NODE_ENV === "development" ? err.message : undefined,
+  });
+});
+
+module.exports = app;
