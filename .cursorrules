@@ -1,0 +1,105 @@
+# Node.js/Express.js Backend Project Guidelines
+
+## Project Structure
+
+- 📁 root/
+- 📁 mws/ - Middleware implementations
+- 📁 public/ - Static public assets
+- 📁 static_arch/ - Static architecture files
+- 📁 managers/ - Business logic managers
+- 📁 loaders/ - Module and service loaders
+- 📁 config/ - Configuration files
+- 📁 connect/ - Connection handlers
+- 📁 libs/ - Utility libraries
+- 📁 cache/ - Redis cache implementations
+- 📄 index.js - Application entry point
+- 📄 app.js - Express application setup
+- 📄 package.json - Project dependencies
+- 📄 .env - Environment variables
+
+## File Naming
+
+- Middlewares: `{name}.mw.js`
+- Managers: `{name}.manager.js`
+- Loaders: `{name}.loader.js`
+- Libs: `{name}.lib.js`
+- Cache: `{name}.cache.js`
+- Config: `{name}.config.js`
+- Tests: `{name}.test.js`
+
+## Naming Conventions
+
+- Managers: `nameManager` (camelCase)
+- Middlewares: `nameMiddleware` (camelCase)
+- Loaders: `nameLoader` (camelCase)
+- Constants: `SCREAMING_SNAKE_CASE`
+- Redis keys: `lowercase-with-dashes`
+
+## Code Style
+
+- Use functional programming patterns
+- Keep functions pure and single-purpose
+- Use async/await for async code
+- Handle errors with try/catch
+- Use early returns to avoid nesting
+- Limit function complexity
+
+## Dependencies
+
+- Express.js for API server
+- ion-cortex for core functionality
+- oyster-db for database operations
+- aeon-machine for machine operations
+- qantra-pineapple for utilities
+- bcrypt for password hashing
+- jsonwebtoken for JWT handling
+- nanoid for ID generation
+- dotenv for environment variables
+
+## Redis Caching
+
+- Implement cache-aside pattern
+- Set appropriate TTL for cached items
+- Use JSON for complex objects
+- Implement cache invalidation
+- Handle cache misses gracefully
+- Use pub/sub for cache invalidation
+- Prefix keys by feature/domain
+
+## Documentation
+
+- JSDoc for functions and interfaces
+- Document caching strategies
+- Examples for complex operations
+- Maintain comprehensive README
+- Document environment variables
+
+## Testing
+
+- Unit tests for managers
+- Integration tests for APIs
+- Mock Redis operations
+- Test cache scenarios
+- Test error handling
+- Use test framework
+- Maintain good coverage
+
+## Performance
+
+- Implement rate limiting
+- Use Redis connection pooling
+- Handle Redis operation errors
+- Monitor Redis memory
+- Use appropriate logging
+- Enable compression
+- Set security headers
+
+## Development
+
+- Use ESLint
+- Use Prettier
+- Pre-commit hooks
+- Semantic versioning
+- Maintain changelog
+- Use environment variables
+- Implement logging strategy
